@@ -43,9 +43,38 @@ class Borrow:
 
     self.db_connection.db.commit()
 
+  # Generate a report of the most borrowed book 
+  def most_borrowed_book(self):
+    query='''
+    SELECT books.title, COUNT(borrows.book_id) as borrow_count 
+    FROM borrows
+    JOIN books ON borrows.book_id = books.book_id
+    GROUP BY borrows.book_id
+    ORDER BY borrow_count DESC
+    '''
+
+    self.db_connection.cursor.execute(query)
+    results = self.db_connection.cursor.fetchall()
+    print(f'Most borrowed books: {results[0][0]}, Times Borrowed: {results[0][1]}')
+
+  def most_active_member(self):
+    query='''
+    SELECT members.name, COUNT(borrows.member_id) as member_count
+    FROM borrows
+    JOIN members ON borrows.member_id = members.member_id
+    GROUP BY borrows.member_id
+    ORDER BY member_count DESC
+    '''
+    self.db_connection.cursor.execute(query)
+    results=self.db_connection.cursor.fetchall()
+    print(f'Most active member: {results[0][0]}')
 
 
 
 borrow_1 = Borrow(DATABASE())
-#borrow_1.borrow_book(2, [3,4])
-borrow_1.return_book(3)
+# borrow_1.borrow_book(2, [6])
+# borrow_1.borrow_book(3, [3,4])
+# borrow_1.borrow_book(4, [3,6])
+# borrow_1.borrow_book(5, [3,6])
+# borrow_1.return_book(3)
+borrow_1.most_active_member()
