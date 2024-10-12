@@ -71,6 +71,39 @@ class Test_Borrow(unittest.TestCase):
     self.mock_db.commit.assert_called_once()
 
 
+  def test_return_book(self):
+    # Alway call fetchone side_effect before call actual method 
+    self.mock_cursor.fetchone.side_effect=[(5,)]
+
+    # Call method want to test 
+    self.borrow_1.return_book(1)
+
+    
+
+    # Assert Update return date
+    self.mock_cursor.execute.assert_any_call(
+      'UPDATE borrows SET return_date=CURRENT_TIMESTAMP WHERE book_id=%s',
+      (1, )
+    )
+    # Assert Select stock from book
+    self.mock_cursor.execute.assert_any_call(
+      'SELECT stock FROM books WHERE book_id=%s',
+      (1,)
+    )
+
+    # Assert Update book stock 
+    #self.mock_cursor.execute.assert_any_call(
+     # 'UPDATE books SET stock=%s WHERE book_id=%s',
+      #(self.mock_cursor.fetchone().__getitem__().__add__(), 1)
+    #)
+
+    self.mock_cursor.execute.assert_any_call(
+      'UPDATE books SET stock=%s WHERE book_id=%s',
+      (6, 1)
+    )
+
+    # Commit 
+    self.mock_db.commit.assert_called_once()    
 
 
 
